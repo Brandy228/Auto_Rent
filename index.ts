@@ -2,20 +2,22 @@ class DriveEase {
     public owners: Person[] = [];
     public country_offices: Country_Office[] = [];
     // TODO: додавати нові офіси
+    //TODO CountryOffice rename(_)
     // чи треба прописувати юзеру можливість угнати машину і чи прописувати метод розбитися
     // треба буде якось працювати з драйвер ліценз+якось працювати з ув'язненнями< треба якось це переробити
 }
 
 
 class Person {
+    //TODO add class personal infromation
     public name: String;
     public sex: SexType;
     public age: Number;
     public money: number; //N->n
-    public address: Location1[] = [];
-    public criminal_record: String;
+    public address: Location1[] = []; //TODO rename to coordinates
+    public criminal_record: String;//TODO change string to boolean or [criminal, administrative...]
     public drivers_license: Category[]=[]; 
-    public phone_nums: Number[] = [];
+    public phone_nums: Number[] = []; //TODO maybe change number to string
     public workplace: Country_Office | null; // додати щось по типу ще немає або є або нам не треба нічого добавляти
 
     constructor(name: String, sex: SexType, age: number, money: number, address: Location1[], criminal_record: String, drivers_license: Category[], phone_nums: number[], workplace: Country_Office | null) {
@@ -86,6 +88,7 @@ class Country_Office {
         this.phone_nums = phone_nums;
         this.application = application;
     }
+    //TODO look to the transaction
     public transaction(customer: User, ammount: number): String {
         try {
         if (customer.about_person.money >= ammount) {
@@ -104,6 +107,7 @@ class Country_Office {
 }
 
 class Address {
+    //maybe we need number of building
     public country: String;
     public city: String;
     public street: String;
@@ -156,7 +160,7 @@ class Application {
 class User {
     public login: String;
     public password: String;
-    //todo: rename
+    //todo: rename (profile)
     public about_person: Person;
 
     //викликати допомогу ( певно треба буде перевіряти чи вчн орендував машину)
@@ -187,7 +191,7 @@ class Car {
     public box: GearBox;
     public id: string; 
     public price: number; //N->n
-    public gps: Location1 | Garage; 
+    public gps: Location1 | Garage; //TODO Garage nahui ne nado tyt
 
     public already_rented: boolean;
     public renter: User | null;
@@ -210,6 +214,7 @@ enum CarType {
     Roadster,
     Sports_Car,
     Electric_Car,
+    //TODO check olx, because sport car and electric car are 
     Hybrid
 }
 enum GearBox {
@@ -253,6 +258,7 @@ class RentSpecs {
             return "Авто орендовано"
         }
         else {
+            //TODO rework this, in garage not auto
             return "На жаль, у вас недостатньо грошей для оренди автомобіля.Але не впадайте у відчай! Ви можете заробити необхідні кошти, приєднавшись до нашої команди.Ми завжди шукаємо нових співробітників, які прагнуть працювати в динамічному середовищі та отримувати нові навички.Зверніться до нас, щоб дізнатися про відкриті вакансії і можливості для кар'єрного зростання. Разом ми зможемо досягти великих результатів!"
         }
 
@@ -286,3 +292,5 @@ const Ukraine_Office = new Country_Office(
     [3809854436356,380985336345], 
     []
 );
+//не прописувати так ось це все(там один рядок а там декілька), не робити new Address... краще змінну об'явити
+//там з маленької персон а тут офіс з великої, не порядок, слідкуй за пробілами(відступами дужок)
