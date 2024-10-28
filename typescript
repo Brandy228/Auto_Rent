@@ -1,182 +1,371 @@
-class AutoRent {
-    public company: CompanyParameters[]=[];
-    public cars: CarCategory[]=[];
-    public users: User[]=[];
-    public rent: RentSpecs[]=[];
-    public locationofcar: Location[]=[];
-    public interaction: Feedback[]=[];
-    public service: Support[]=[];
+class DriveEase {
+    public owners: Person[] = [];
+    public country_offices: Country_Office[] = [];
+    // TODO: додавати нові офіси
+    //TODO CountryOffice rename(_)
+    // чи треба прописувати юзеру можливість угнати машину і чи прописувати метод розбитися
+    // треба буде якось працювати з драйвер ліценз+якось працювати з ув'язненнями< треба якось це переробити
 }
 
-class CompanyParameters {
-    public name: String;
-    public addresses: Address[]=[];
-    public owners: Person[]=[];
-    public employees: Person[]=[];
-    public money: EarnPer[]=[];
-    public phone_num: Number;
-}
 
-class Address {
-    public country: String;
-    public city: String;
-    public street: String;
-    public num: Number;
-  }
-  
 class Person {
+    //TODO add class personal infromation
     public name: String;
+    public employee: Employee[] = [];
     public sex: SexType;
     public age: Number;
-    public workplace:CompanyParameters;
-    public money: EarnPer[]=[];
-    public address: Address[] = [];
-    public criminal_record: String;
-    public drivers_license: Category;
-    public phone_num: Number;
-  }
+    public money: number; //N->n
+    public address: Coordinate[] = []; 
+    public criminal_record: Boolean;
+    public drivers_license: Category[]=[]; 
+    public phone_nums: String[] = []; 
+    public workplace: Country_Office | null; // додати щось по типу ще немає або є або нам не треба нічого добавляти
 
-  enum SexType {
+    constructor(name: String, sex: SexType, age: number, money: number, address: Coordinate[], criminal_record: Boolean, drivers_license: Category[], phone_nums: String[], workplace: Country_Office | null) {
+        this.name = name;
+        this.sex = sex;
+        this.age = age;
+        this.money = money;
+        this.address = address;
+        this.criminal_record = criminal_record;
+        this.drivers_license = drivers_license;
+        this.phone_nums = phone_nums;
+        this.workplace = workplace;
+    }
+}
+
+
+enum SexType {
     Male,
     Female,
     Another
-  }
+}
 
-  class EarnPer {
-    public hour: Number;
-    public day: Number; 
-    public month: Number;
-    public year: Number;
-  }
-  
-  enum Category {
+
+class Coordinate {
+    private latitude: number;
+    private longitude: number;
+
+    constructor(latitude: number, longitude: number) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
+
+    public getCoordinates() {
+        return { latitude: this.latitude, longitude: this.longitude };
+    }
+
+    public setCoordinates(latitude: number, longitude: number): void {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+}
+
+enum CategoryLicense {
+    A,
     B,
     C,
     D,
     BE,
     CE,
     DE
-  }
+}
 
+
+class Country_Office {
+    public addresses: Address[] = [];
+    public employees: Person[] = [];
+    public money: number;
+    public phone_nums: Number[] = [];
+    public application: Application[] = [];
+    
+    constructor(adresses: Address[], money: number, phone_nums: Number[], application: Application[]) 
+    {
+        this.addresses = adresses;
+        this.money = money;
+        this.phone_nums = phone_nums;
+        this.application = application;
+    }
+    //TODO look to the transaction
+    public transaction(customer: Profile, ammount: number): String {
+        try {
+        if (customer.about_person.money >= ammount) {
+            customer.about_person.money -= ammount;
+            this.money += ammount;
+            return "Транзакція пройшла успішно"
+        }
+        else {
+            return "Транзакція не пройшла успішно"
+        }
+        }
+        catch (error) {
+            return `Error: ${error.message}`;
+        }
+    }
+}
+
+type Employee = {
+    id: Number;
+    name: String;
+    position: String;
+};
+
+class EmployeeManager {
+    private employees: Employee[] = [];
+
+    // Додає працівника до списку
+    addEmployee(employee: Employee): void {
+        this.employees.push(employee);
+        console.log(`Працівник ${employee.name} доданий до списку.`);
+    }
+
+    // Видаляє працівника зі списку за ID
+    removeEmployee(id: number): void {
+        const index = this.employees.findIndex(emp => emp.id === id);
+        if (index !== -1) {
+            const removedEmployee = this.employees.splice(index, 1)[0];
+            console.log(`Працівник ${removedEmployee.name} видалений зі списку.`);
+        } else {
+            console.log(`Працівника з ID ${id} не знайдено.`);
+        }
+    }
+
+    // Виводить список всіх працівників
+    listEmployees(): void {
+        console.log("Список працівників:");
+        this.employees.forEach(employee => {
+            console.log(`ID: ${employee.id}, Ім'я: ${employee.name}, Посада: ${employee.position}`);
+        });
+    }
+}
+
+
+class Address {
+    public country: String;
+    public region: String;
+    public city: String;
+    public street: String;
+    public building: Number;
+    public location: Coordinate[] = [];
+
+    constructor(country:String, city:String, street:String,building:Number,location:Coordinate[]) {
+        this.country = country;
+        this.city = city;
+        this.street = street;
+        this.building;
+        this.location = location;
+    }
+}
+
+
+class Application {
+    public Profiles: Profile[] = [];
+    public garages: Garage[] = []; 
+    public rent: RentSpecs[] = [];
+    public interaction: Feedback[] = [];
+    public service: Support[] = [];
+
+    constructor(rent:RentSpecs[]) {
+        this.rent = rent;
+    }
+
+    public addProfile(Profile: Profile): void {
+        this.Profiles.push(Profile);
+    }
+    public addFeedback(feedback: Feedback): void {
+        this.interaction.push(feedback);
+    }
+
+    public addGarage(garage: Garage): void {
+        this.garages.push(garage);
+    }
+
+    /*
+    |
+    | ChatGPT
+    v чи треба воно? хай буде
+*/
+    public getGarageByName(name: string): Garage | undefined {
+        return this.garages.find(garage => garage.name === name);
+    }
+
+
+}
+
+
+class Profile {
+    public login: String;
+    public password: String;
   
+    public about_person: Person;
 
-class CarCategory{
-    public car_type: Type;
-    public name_mark: Mark;
-    public name_model: Model;
+    //викликати допомогу ( певно треба буде перевіряти чи вчн орендував машину)
+}
+
+class Garage {
+    public name: String;
+    public address: Address;
+    public cars: Car[] = [];
+
+
+    public addCar(car: Car): void {
+        this.cars.push(car);
+    }
+    public getAllCars(): Car[] {
+        return this.cars;
+    }
+    public getAvailableCars(): Car[] {
+        return this.cars.filter(car => !car.already_rented && !car.broken); // стирив з ChatGPT
+    }
+}
+
+
+class Car {
+    
+    public name_mark: String;
+    public name_model: String;
     public box: GearBox;
-    public id: Number;
-    public price: Number;
-    public gps: Location[]=[];
-  }
+    public id_number: string; 
+    public price: Number; 
+    public year: Number;
+    public color: String;
+    public gps: Coordinate | null ; 
 
-  enum GearBox{
+    public already_rented: boolean;
+    public renter: Profile | null;
+    public broken: boolean;
+
+}
+
+
+type CarClass = "A" | "B" | "C" | "D" | "E" | "F" | "S" | "J" | "M" | "P";
+
+// price for day
+const rentalRates: Record<CarClass, number> = {
+    "A": 20,  
+    "B": 30,  
+    "C": 40,  
+    "D": 50,  
+    "E": 70,  
+    "F": 100, 
+    "S": 150, 
+    "J": 60,  
+    "M": 45,  
+    "P": 55   
+};
+
+// Функція для обрахунку вартості
+function calculateRentalPrice(carClass: CarClass, rentalDays: number): number {
+    // базова ставка для вказаного класу авто
+    const baseRate = rentalRates[carClass];
+
+    // ціна
+    let totalCost = baseRate * rentalDays;
+
+    // якщо оренда більше 7 днів знижка буде складати 10 відсотків
+    if (rentalDays > 7) {
+        totalCost *= 0.9;  
+    }
+
+   // так само з 30 днів
+    if (rentalDays > 30) {
+        totalCost *= 0.8;  
+    }
+
+    return Math.round(totalCost);  // округлення отриманої суми
+
+}
+
+
+
+    
+
+enum GearBox {
     Automatic,
     Variator,
     Mechanical
-  }
-
-  enum Type {
-    Sedan,
-    Hatchback,
-    Wagon,
-    Coupe,
-    Crossover,
-    SUV,
-    Minivan,
-    Pickup,
-    Convertible,
-    Van,
-    Limousine,
-    Roadster,
-    Sports_Car,
-    Electric_Car,
-    Hybrid
-  }
-
-  enum Mark {
-    Toyota,
-    BMW,
-    Mercedes_Benz,
-    Audi,
-    Volkswagen,
-    Ford,
-    Honda,
-    Nissan,
-    Hyundai,
-    Kia,
-    Chevrolet,
-    Lexus,
-    Mazda,
-    Subaru,
-    Volvo,
-    Jeep,
-    Tesla,
-    Porsche,
-    Land_Rover,
-    Jaguar
-  }
-
-  enum Model {
-    Camry,
-    M_Series,
-    C_Class,
-    A4,
-    Golf,
-    Focus,
-    Civic,
-    Altima,
-    Sonata,
-    Sportage,
-    Malibu,
-    RX,
-    CX_,
-    Outback,
-    XC90,
-    Grand_Cherokee,
-    Model_X,
-    Panamera,
-    Range_Rover,
-    F_Pace
-  }
-
-class User {
-    public login: String;
-    public password: String;
-    public phone_num: Number;
-    public about_person: Person;
 }
 
-class RentSpecs {
-    public garage_locations: Location[]=[];
-    public date: String;
-    public time: String;
-    public spec_of_Auto: CarCategory []=[];
-    public price: PricePer[]=[];
-    public insurance: Number;
+
+
+class RentSpecs { 
+    public garage_location: Garage;
+    public rent_date: Date;
+    public rent_time: String; 
+    public spec_of_Auto: Car;
+    public price: number; 
+    public country_office: Country_Office;
+    public renter: Profile; 
+    public rentAuto(): String {
+
+        if (!this.spec_of_Auto.already_rented) {
+            return "Автомобіль уже орендований іншим користувачем.";
+        }
+
+        if (this.spec_of_Auto.broken) {
+            return "Автомобіль несправний і не може бути орендований.";
+        }
+
+
+
+        let transaction_result = this.country_office.transaction(this.renter, this.price);
+        if (transaction_result === "Транзакція пройшла успішно") {
+            this.spec_of_Auto.already_rented = false;
+            this.spec_of_Auto.renter = this.renter;
+            return "Авто орендовано"
+        }
+        else {
+            //TODO rework this, in garage not auto
+            return "На жаль, у вас недостатньо грошей для оренди автомобіля."
+        }
+
+
+
+
+    }
 }
- 
-class PricePer {
-    public day: Number; 
-    public week: Number;
-    public month: Number;
-    public three_month: Number;
-  }
+
+type Category = {
+    code: string;
+    description: string;
+};
+
+class Driver {
+    public drivers_license: Category[] = [];
+
+    constructor(drivers_license: Category[]) {
+        this.drivers_license = drivers_license;
+    }
+
+    // Функція для перевірки наявності певної категорії прав
+    hasLicense(categoryCode: string): boolean {
+        return this.drivers_license.some(category => category.code === categoryCode);
+    }
+}
+
 
 class Feedback {
-    public respond: Rating;
-    public user_info: User;
-
-  }
-
-  enum Rating {
-    Horrible,
-    Bad,
-    Normal,
-    Nice,
-    Excellent 
-  }
-
-class Support{
-    public
+    public respond: String;
 }
+
+
+
+
+class Support {
+    public repair_price: Number;
+
+    public repair_auto(auto_id: String, ): void {
+    }
+}
+
+const person = new Person("Біллі",SexType.Another,321,21,[new Coordinate(10,10)], "Тричі сидівший зек",[CategoryLicense.BE,CategoryLicense.A],[312980],null );
+
+//const Ukraine_Office = new Country_Office(
+    //[new Address('Ukraine', 'Citu', 'Shevchenko', [new Coordinate(1021,120)])],
+    //1921, 
+    //[3809854436356,380985336345], 
+    //[]
+//);
+//не прописувати так ось це все(там один рядок а там декілька), не робити new Address... краще змінну об'явити
+//там з маленької персон а тут офіс з великої, не порядок, слідкуй за пробілами(відступами дужок)
