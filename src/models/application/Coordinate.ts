@@ -1,7 +1,7 @@
 export class Coordinate {
-    public latitude: Number;
-    public longitude: Number;
-    public altitude?: Number;
+    public latitude: number;
+    public longitude: number;
+    public altitude?: number;
     //TODO make it private and add method setCoordinate and add to it limit for value
 
     constructor(latitude: number, longitude: number) {

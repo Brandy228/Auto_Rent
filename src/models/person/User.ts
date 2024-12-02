@@ -1,4 +1,4 @@
-import { Person, PersonalInformation } from "./Person";
+import { Person, PersonalInformation } from "./Person.ts";
 import { RentSpecs } from "../application/RentSpecs";
 import { DriverLicense } from "./DriverLicense";
 

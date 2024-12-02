@@ -8,7 +8,7 @@ export class CountryOffice {
     public admins: Admin[]=[];
     public money: Number;
     public phone_numbers: Number[] = [];
-    public applications: Application[] = [];
+    public applications: Application;
 
     constructor(address: Coordinate,money: Number) {
         this.address = address;
@@ -36,15 +36,5 @@ export class CountryOffice {
     public removeAdmin(admin: Admin): void 
     {
         this.admins = this.admins.filter((a) => a !== admin);
-    }
-
-    public addApplication(application: Application): void 
-    {
-        this.applications.push(application);
-    }
-
-    public listApplications(): Application[] 
-    {
-        return this.applications;
     }
 }

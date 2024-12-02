@@ -22,6 +22,7 @@ export class DriverLicenseCategory {
     public categories: DriverLicenseCategory[]=[];
     public id: Number;
 
+
     public addCategory(category: DriverLicenseCategory):void 
     {
       this.categories.push(category);

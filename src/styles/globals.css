@@ -1,0 +1,59 @@
+/* globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .border-running-animation {
+    position: relative;
+    border-radius: 0.5rem;
+  }
+
+  .border-running-animation::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: inherit;
+    border: 2px solid transparent;
+    mask: 
+      linear-gradient(#fff 0 0) padding-box, 
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: destination-out;
+    mask-composite: exclude;
+    background: conic-gradient(
+      from var(--angle),
+      transparent 1%,
+      #2563EB 10%,
+      transparent 11%,
+      transparent 50%, 
+      transparent 51%,
+      #2563EB 60%,
+      transparent 61%,
+      transparent 100%
+    ) border-box;
+    animation: rotate-border 4s linear infinite;
+  }
+}
+
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes rotate-border {
+  to {
+    --angle: 720deg;
+  }
+}
+
+/* globals.css */
+/* .rdrDay.disabled .rdrDayNumber span {
+  background-color: #ff0000; 
+  color: rgb(99, 0, 0);
+  pointer-events: none;
+  opacity: 0.6;
+} */

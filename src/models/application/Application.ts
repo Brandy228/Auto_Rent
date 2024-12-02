@@ -1,36 +1,29 @@
 import { User } from "../person/User";
 import { Garage } from "../garage/Garage";
 import { RentSpecs } from "./RentSpecs";
-import { Feedback } from "./Feedback";
 
 export class Application {
-    //TODO rework
     public users: User[] = [];
     public garages: Garage[] = [];
     public rent: RentSpecs[] = [];
-    public feedbacks: Feedback[] = [];
 
     constructor(rent: RentSpecs[]) {
         this.rent = rent;
+        //this.loadFromStorage();
     }
 
-    public addUser(user: User): void 
-    {
+    public addUser(user: User): void {
         this.users.push(user);
+        //this.saveToStorage();
     }
 
-    public addFeedback(feedback: Feedback): void 
-    {
-        this.feedbacks.push(feedback);
-    }
-
-    public addGarage(garage: Garage): void 
-    {
+    public addGarage(garage: Garage): void {
         this.garages.push(garage);
+        //this.saveToStorage();
     }
 
-    public getGarageByName(name: String): Garage | null 
-    {
+    public getGarageByName(name: string): Garage | null {
         return this.garages.find(garage => garage.name === name) || null;
-    }  
+    }
+
 }
