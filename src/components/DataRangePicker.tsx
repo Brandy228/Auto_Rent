@@ -1,50 +1,52 @@
 // DataRangePicker.tsx
-import React, { useState } from 'react';
-import { DateRange } from 'react-date-range';
+import React, { useState, useEffect } from 'react';
+//import { DateRange, RangeKeyDict } from 'react-date-range';
 import { addDays, addYears, startOfDay, differenceInDays } from 'date-fns';
-import { enUS } from 'date-fns/locale';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
-import '../styles/globals.css';
+import { Car } from '../models/garage/vehicle/Car';
+import { RentSpecs } from '../models/application/RentSpecs';
+import {DateRange, RangeKeyDict} from 'react-date-range';
 
-type DateRangeType = {
-  startDate: Date;
-  endDate: Date;
-};
+interface DataRangePickerProps {
+  car: Car;
+  onDateSelect: (startDate: Date, endDate: Date) => void;
+}
 
-const DataRangePicker = () => {
+const DataRangePicker = ({ car, onDateSelect }: DataRangePickerProps) => {
   const [selectionRange, setSelectionRange] = useState({
     startDate: new Date(),
     endDate: new Date(),
     key: 'selection',
   });
 
-  const handleSelect = (ranges: any) => {
-    setSelectionRange({
-      startDate: ranges.selection.startDate,
-      endDate: ranges.selection.endDate,
-      key: 'selection',
-    });
+  const [disabledDates, setDisabledDates] = useState<Date[]>([]);
+
+  useEffect(() => {
+    if (car && car.rents && car.rents.length > 0) {
+      const dates: Date[] = [];
+      car.rents.forEach((rent) => {
+        let currentDate = new Date(rent.rent_start);
+        const endDate = new Date(rent.rent_end);
+        
+        while (currentDate <= endDate) {
+          dates.push(new Date(currentDate));
+          currentDate = addDays(currentDate, 1);
+        }
+      });
+      setDisabledDates(dates);
+    } else {
+      setDisabledDates([]);
+    }
+  }, [car]);
+
+  const handleSelect = (ranges: RangeKeyDict) => {
+    setSelectionRange(ranges.selection);
+    onDateSelect(ranges.selection.startDate, ranges.selection.endDate);
   };
 
-  // Розрахунок кількості днів між датами
-  const getDaysDifference = () => {
-    // const diff = differenceInDays(selectionRange.endDate, selectionRange.startDate);
-    // console.log(selectionRange,diff)
-    // return diff + 1; // +1 тому що включаємо обидві дати
-    const startDate = startOfDay(selectionRange.startDate);
-    const endDate = startOfDay(selectionRange.endDate);
-    const diff = differenceInDays(endDate, startDate) + 1; // +1 для включення кінцевої дати
-    return diff;
-  };
-
-  const minDate = new Date();
+  const minDate = startOfDay(new Date());
   const maxDate = addYears(new Date(), 1);
-
-  const disabledRanges: DateRangeType[] = [
-    { startDate: addDays(new Date(), 5), endDate: addDays(new Date(), 10) },
-    { startDate: addDays(new Date(), 15), endDate: addDays(new Date(), 20) },
-  ];
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -54,31 +56,20 @@ const DataRangePicker = () => {
           onChange={handleSelect}
           minDate={minDate}
           maxDate={maxDate}
+          preventSnapRefocus={true}
           months={3}
           direction="horizontal"
-          preventSnapRefocus={true}
-          // locale={enUS}
           rangeColors={['#3b82f6']}
-          disabledDates={disabledRanges.flatMap(range => {
-            const dates: Date[] = [];
-            let currDate: Date = new Date(range.startDate);
-            while (currDate <= range.endDate) {
-              dates.push(new Date(currDate));
-              currDate = addDays(currDate, 1);
-            }
-            return dates;
-          })}
+          disabledDates={disabledDates}
         />
       </div>
-      
-      {/* Відображення кількості днів */}
       <div className="bg-blue-50 p-4 rounded-lg shadow text-center">
         <p className="text-lg font-semibold text-blue-800">
-          Rental period: {getDaysDifference()} days
+          Rent range: {differenceInDays(selectionRange.endDate, selectionRange.startDate) + 1} days
         </p>
       </div>
     </div>
   );
 };
-
+//TODO clear local storage dates
 export default DataRangePicker;

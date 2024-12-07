@@ -1,8 +1,8 @@
 // AdminCarList.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import LicensePlate from './LicensePlate.tsx';
-import { Car } from '../models/garage/vehicle/Car';
-import { Garage } from '../models/garage/Garage';
+import { Car } from '../models/garage/vehicle/Car.ts';
+import { Garage } from '../models/garage/Garage.ts';
 import '../styles/globals.css';
 
 interface GaragesListProps {
@@ -39,6 +39,7 @@ export default function AdminCarsList({ garages }: GaragesListProps) {
   const [expandedGarage, setExpandedGarage] = useState<string | null>(null);
   const [selectedCar, setSelectedCar] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
+
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -81,12 +82,7 @@ export default function AdminCarsList({ garages }: GaragesListProps) {
             {expandedGarage === garage.name && (
               <div className="p-4 bg-gray-50">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {garage.vehicles
-                    .filter(car => 
-                      car.gps.latitude === garage.address.latitude &&
-                      car.gps.longitude === garage.address.longitude
-                    )
-                    .map(car => (
+                  {garage.getAvailableCars().map(car => (
                       <CarCard
                         key={car.details.license_plate}
                         car={car}
@@ -105,11 +101,7 @@ export default function AdminCarsList({ garages }: GaragesListProps) {
         <h2 className="text-2xl font-semibold mb-4">Rented Cars</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {garages.flatMap(garage =>
-            garage.vehicles.filter(car =>
-              car.gps.latitude !== garage.address.latitude ||
-              car.gps.longitude !== garage.address.longitude
-            )
-          ).map(car => (
+            garage.getRentedCars()).map(car => (
             <CarCard
               key={car.details.license_plate}
               car={car}

@@ -24,14 +24,23 @@ export class Garage {
         }
     }
 
-    public getAvailableCars(): Vehicle[] 
-    {
-        return this.vehicles.filter(vehicle => vehicle.power_sources.length > 0);
+
+    public getRentedCars(): Car[] {
+        const today = new Date();
+        return this.vehicles.filter(car => 
+            car.rents.some(rent => 
+                new Date(rent.rent_start) <= today && new Date(rent.rent_end) >= today
+            )
+        );
     }
 
-    public getRentedCars(): Car[]
-    {
-        return this.vehicles.filter(vehicle => vehicle.state.is_available);
+    public getAvailableCars(): Car[] {
+        const today = new Date();
+        return this.vehicles.filter(car => 
+            !car.rents.some(rent => 
+                new Date(rent.rent_start) <= today && new Date(rent.rent_end) >= today
+            )
+        );
     }
 
     // public getVehicles(): Vehicle[]

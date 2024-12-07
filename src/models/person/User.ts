@@ -4,6 +4,8 @@ import { DriverLicense } from "./DriverLicense";
 
 export class User extends Person {
     public login: String;
+    private static nextId = 1;
+    public id: number;
     public password: String;
     public discount_procent: Number;
     public rental_history: RentSpecs[]=[];
@@ -12,6 +14,7 @@ export class User extends Person {
         super(personal_information,money,criminal_record,driver_license)
         this.login = login;
         this.password = password;
+        this.id = User.nextId++;
     }
 
     public rentVehicle(rent_specs:RentSpecs): void 

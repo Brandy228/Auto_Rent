@@ -17,19 +17,19 @@ export abstract class Vehicle {
         this.type = type;
     }
 
-    public addFeedback(feedback: Feedback): void 
-    {
-        this.feedbacks.push(feedback);
-    }
+    // public addFeedback(feedback: Feedback): void 
+    // {
+    //     this.feedbacks.push(feedback);
+    // }
 
-    public getAverageFeedbackRating(): number 
-    {
-        if (this.feedbacks.length === 0) return 0;
+    // public getAverageFeedbackRating(): number 
+    // {
+    //     if (this.feedbacks.length === 0) return 0;
 
-        const totalRating = this.feedbacks.reduce((sum, feedback) => {
-            return sum + feedback.car_quality;
-        }, 0);
+    //     const totalRating = this.feedbacks.reduce((sum, feedback) => {
+    //         return sum + feedback.car_quality;
+    //     }, 0);
 
-        return totalRating / this.feedbacks.length;
-    }
+    //     return totalRating / this.feedbacks.length;
+    // }
 }

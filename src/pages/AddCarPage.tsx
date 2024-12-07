@@ -84,7 +84,7 @@ export default function AddCarPage({ onAddCar }: AddCarPageProps) {
           name="mark"
           value={formData.mark}
           onChange={handleChange}
-          placeholder="Enter mark"
+          placeholder="Mark"
           autoComplete="off"
           className="px-4 py-2 border rounded-md w-full"
         />
@@ -142,6 +142,7 @@ export default function AddCarPage({ onAddCar }: AddCarPageProps) {
           <option value="RX" />
           <option value="Evoque" />
           <option value="Wrangler" />
+          <option value="Land Cruiser" />
         </datalist>
 
         <input
@@ -179,24 +180,13 @@ export default function AddCarPage({ onAddCar }: AddCarPageProps) {
           <option value={GearBox.Mechanical}>Mechanical</option>
           <option value={GearBox.Variator}>Variator</option>
         </select>
-        {/* <select
-          name="body_type"
-          value={formData.body_type}
-          onChange={handleChange}
-          className="px-4 py-2 border rounded-md w-full"
-        >
-          <option value="Sedan">Sedan</option>
-          <option value="Hatchback">Hatchback</option>
-          <option value="SUV">SUV</option>
-          <option value="Coupe">Coupe</option>
-        </select> */}
         <input
           type="text"
           list="bodyTypes"
           name="body_type"
           value={formData.body_type}
           onChange={handleChange}
-          placeholder="Enter body type"
+          placeholder="Body type"
           autoComplete="off"
           className="px-4 py-2 border rounded-md w-full"
         />
