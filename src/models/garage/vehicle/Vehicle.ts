@@ -4,32 +4,26 @@ import { PowerSource } from "./PowerSource";
 
 export abstract class Vehicle {
     public power_sources: PowerSource[]=[];
-    public price: number;
+    private price_per_day: number;
     public gps: Coordinate;
-    public feedbacks: Feedback[]=[];
-    public discount_procent: Number;
     public type: String;
 
-    constructor(price: number, gps: Coordinate, discount_procent: Number, type: String) {
-        this.price = price;
+    constructor(power_sources: PowerSource[], gps: Coordinate, type: String) {
+        this.power_sources = power_sources;
         this.gps = gps;
-        this.discount_procent = 0;
         this.type = type;
     }
 
-    // public addFeedback(feedback: Feedback): void 
-    // {
-    //     this.feedbacks.push(feedback);
-    // }
+    public getPricePerDay(): number {
+        return this.price_per_day;
+    }
 
-    // public getAverageFeedbackRating(): number 
-    // {
-    //     if (this.feedbacks.length === 0) return 0;
+    public setPricePerDay(price: number): void {
+        if (price < 0) {
+            alert("Price cannot be negative");
+            throw new Error("Price cannot be negative");
+        }
+        this.price_per_day = price;
+    }
 
-    //     const totalRating = this.feedbacks.reduce((sum, feedback) => {
-    //         return sum + feedback.car_quality;
-    //     }, 0);
-
-    //     return totalRating / this.feedbacks.length;
-    // }
 }

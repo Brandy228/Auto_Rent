@@ -7,44 +7,63 @@ import '../styles/globals.css';
 
 interface GaragesListProps {
   garages: Garage[];
+  selectedCar: Car | null;
+  onSelectCar: (car: Car | null) => void;
+  onViewOnMap: (car: Car) => void; 
 }
 
 // AdminCarList.tsx - update CarCard component
-const CarCard = ({ car, isSelected, onClick }: { 
+const CarCard = ({ car, isSelected, onViewOnMap }: { 
   car: Car; 
   isSelected: boolean; 
-  onClick: () => void;
-}) => (
-  <div
-  onClick={(e) => {
-    e.stopPropagation(); // Prevent click from bubbling up
-    onClick();
-  }}
-  className={`
-    relative bg-white rounded-lg p-4 cursor-pointer
-    ${isSelected ? 'border-running-animation' : ''}
-  `}
-  >
-    <h3 className="font-semibold">
-      {car.details.exterior.mark} {car.details.exterior.model}
-    </h3>
-    <p className="text-sm text-gray-600">Year: {car.details.manufacture_year}</p>
-    <p className="text-sm text-gray-600">GearBox: {car.details.gear_box}</p>
-    <LicensePlate plateNumber={car.details.license_plate} />
-    <p className="text-lg font-bold text-green-600 mt-2">${car.price}/day</p>
-  </div>
-);
+  //onClick: () => void;
+  onViewOnMap: (car: Car) => void;
+}) => {
+  return (
+    <div
+      id={`car-${car.details.license_plate}`}
+      className={`
+        relative bg-white rounded-lg p-4
+        ${isSelected ? 'border-running-animation' : ''}
+      `}
+    >
+      <div className="flex justify-between items-start">
+        <div>
+          <h3 className="font-semibold">
+            {car.details.exterior.mark} {car.details.exterior.model}
+          </h3>
+          <p className="text-sm text-gray-600">Year: {car.details.manufacture_year}</p>
+          <p className="text-sm text-gray-600">GearBox: {car.details.gear_box}</p>
+          <LicensePlate plateNumber={car.details.license_plate} />
+          <p className="text-lg font-bold text-green-600 mt-2">${car.price}/day</p>
+        </div>
+      </div>
+      
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onViewOnMap(car);
+        }}
+        className="mt-2 w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+      >
+        View on Map
+      </button>
 
-export default function AdminCarsList({ garages }: GaragesListProps) {
+      {/* Calendar Modal */}
+    </div>
+  );
+};
+
+export default function AdminCarsList({ garages, selectedCar, onSelectCar, onViewOnMap  }: GaragesListProps) {
   const [expandedGarage, setExpandedGarage] = useState<string | null>(null);
-  const [selectedCar, setSelectedCar] = useState<string | null>(null);
+  //const [selectedCar, setSelectedCar] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (listRef.current && !listRef.current.contains(event.target as Node)) {
-        setSelectedCar(null);
+        onSelectCar(null);
       }
     };
 
@@ -52,10 +71,19 @@ export default function AdminCarsList({ garages }: GaragesListProps) {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [onSelectCar]);
+
+  useEffect(() => {
+    if (selectedCar) {
+      const element = document.getElementById(`car-${selectedCar.details.license_plate}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }, [selectedCar]);
 
   return (
-    <div className="space-y-6" ref={listRef} onClick={() => setSelectedCar(null)}>
+    <div className="space-y-6" ref={listRef} onClick={() => onSelectCar(null)}>
       <div className="space-y-4">
         {garages.map((garage) => (
           <div key={garage.name} className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
@@ -86,8 +114,12 @@ export default function AdminCarsList({ garages }: GaragesListProps) {
                       <CarCard
                         key={car.details.license_plate}
                         car={car}
-                        isSelected={selectedCar === car.details.license_plate}
-                        onClick={() => setSelectedCar(car.details.license_plate)}
+                        isSelected={selectedCar?.details.license_plate === car.details.license_plate}
+                        //onClick={() => onSelectCar(car)}
+                        onViewOnMap={() => {
+                          setExpandedGarage(null);
+                          onViewOnMap(car)}
+                      }
                       />
                     ))}
                 </div>
@@ -105,8 +137,9 @@ export default function AdminCarsList({ garages }: GaragesListProps) {
             <CarCard
               key={car.details.license_plate}
               car={car}
-              isSelected={selectedCar === car.details.license_plate}
-              onClick={() => setSelectedCar(car.details.license_plate)}
+              isSelected={selectedCar?.details.license_plate === car.details.license_plate}
+              //onClick={() => onSelectCar(car)}
+              onViewOnMap={onViewOnMap}
             />
           ))}
         </div>

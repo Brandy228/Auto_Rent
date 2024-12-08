@@ -6,13 +6,11 @@ export class Garage {
     public name: string;
     public address: Coordinate;
     public vehicles: Car[] = [];
-    public max_cars: number;
-    //public mechanics: Mechanic[]=[];
+    private max_cars: number;
 
-    constructor(name: string, address: Coordinate, max_cars: number) {
+    constructor(name: string, address: Coordinate) {
         this.name = name;
         this.address = address;
-        this.max_cars = max_cars;
     }
 
     public addVehicle(vehicle: Car): void 
@@ -20,6 +18,7 @@ export class Garage {
         if (this.vehicles.length < (this.max_cars as number)) {
             this.vehicles.push(vehicle);
         } else {
+            alert("Garage is full.");
             throw new Error("Garage is full.");
         }
     }
@@ -43,12 +42,19 @@ export class Garage {
         );
     }
 
-    // public getVehicles(): Vehicle[]
-    // {
-    //     return this.vehicles.filter(vehicle => vehicle.type === "Car");
-    // }
-
     public getVehicles(): Car[] {
         return this.vehicles.filter((vehicle): vehicle is Car => vehicle instanceof Car);
+    }
+
+    public setMaxCars(max_cars: number): void {
+        if (max_cars < 0) {
+            alert("Capacity cannot be negative");
+            throw new Error("Capacity cannot be negative");
+        }
+        this.max_cars = max_cars;
+    }
+
+    public getMaxCars(): number {
+        return this.max_cars;
     }
 }
