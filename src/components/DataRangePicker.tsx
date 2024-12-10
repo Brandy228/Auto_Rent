@@ -21,6 +21,8 @@ const DataRangePicker = ({ car, onDateSelect }: DataRangePickerProps) => {
   });
 
   const [disabledDates, setDisabledDates] = useState<Date[]>([]);
+  console.log(car) 
+  console.log(disabledDates)
 
   useEffect(() => {
     if (car && car.rents && car.rents.length > 0) {

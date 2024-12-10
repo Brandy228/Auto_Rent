@@ -1,49 +1,74 @@
-// src/utils/deserialize.ts
+// Deserialize.ts
 
 import { Garage } from '../models/garage/Garage.ts';
 import { Coordinate } from '../models/application/Coordinate.ts';
-import { Car } from '../models/garage/vehicle/Car.ts';
+import { Car, CarDetails, Exterior, GearBox } from '../models/garage/vehicle/Car.ts';
 import { RentSpecs } from '../models/application/RentSpecs.ts';
+import { PowerSource } from '../models/garage/vehicle/PowerSource.ts';
 
-// Helper function to deserialize RentSpecs
+// Десеріалізація RentSpecs
 const deserializeRentSpecs = (rentData: any): RentSpecs => {
   return new RentSpecs(
     new Date(rentData.rent_start),
     new Date(rentData.rent_end),
     rentData.vehicle_license_plate,
-    rentData.renter_id
+    rentData.renter_login
   );
 };
 
-// Helper function to deserialize Car
-const deserializeCar = (carData: any): Car => {
-  const gps = new Coordinate(carData.gps.latitude, carData.gps.longitude);
-  
-  const car = new Car(
-    carData.price,
-    gps,
-    carData.discount_procent,
+// Десеріалізація PowerSource
+const deserializePowerSource = (psData: any): PowerSource => {
+  return new PowerSource(
+    psData.type,
+    psData.capacity,
+    psData.measurement_unit
+  );
+};
+
+// Десеріалізація CarDetails
+const deserializeCarDetails = (detailsData: any): CarDetails => {
+  const exterior = new Exterior(
+    detailsData.exterior.mark,
+    detailsData.exterior.model,
+    detailsData.exterior.body_type
   );
 
-  // Deserialize rents
-  car.rents = carData.rents.map((rent: any) => deserializeRentSpecs(rent));
+  return new CarDetails(
+    exterior,
+    detailsData.license_plate,
+    detailsData.gear_box as GearBox,
+    detailsData.manufacture_year
+  );
+};
 
-  // If Car has a details property, deserialize it accordingly
-  if (carData.details) {
-    car.details = {
-      exterior: carData.details.exterior,
-      manufacture_year: carData.details.manufacture_year,
-      gear_box: carData.details.gear_box,
-      license_plate: carData.details.license_plate,
-      last_maintenance: carData.details.last_maintenance,
-      // Add other properties if necessary
-    };
-  }
+// Десеріалізація Car
+const deserializeCar = (carData: any): Car => {
+  const gps = new Coordinate(carData.gps.latitude, carData.gps.longitude);
+
+  const powerSources = carData.power_sources.map((psData: any) => deserializePowerSource(psData));
+
+  const details = deserializeCarDetails(carData.details);
+
+  const price = carData.price_per_day;
+  
+  const rents = carData.rents.map((rent: any) => deserializeRentSpecs(rent));
+
+  const car = new Car(
+    powerSources,
+    gps,
+    details, 
+    price,
+    rents
+  );
+
+  //car.setPricePerDay(carData.price_per_day);
+
+  // Десеріалізація оренд
 
   return car;
 };
 
-// Helper function to deserialize Garage
+// Десеріалізація Garage
 export const deserializeGarages = (garagesData: any[]): Garage[] => {
   return garagesData.map((garageData: any) => {
     const address = new Coordinate(
@@ -57,7 +82,7 @@ export const deserializeGarages = (garagesData: any[]): Garage[] => {
       garageData.max_cars
     );
 
-    // Deserialize vehicles
+    // Десеріалізація автомобілів
     garage.vehicles = garageData.vehicles.map((carData: any) => deserializeCar(carData));
 
     return garage;

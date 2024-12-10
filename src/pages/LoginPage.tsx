@@ -1,32 +1,42 @@
-// components/LoginForm.tsx
+// src/pages/LoginPage.tsx
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../AuthContext.tsx';
+import { User, Role } from '../models/person/User.ts';
 
 const LoginPage = () => {
-  const [formData, setFormData] = useState({ login: '', password: '' });
-  const { login } = useContext(AuthContext);
+  const [login, setLogin] = useState('');
+  const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const { setCurrentUser } = useContext(AuthContext);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('login:', login, 'password:', password)
+    const existingUsers: User[] = JSON.parse(localStorage.getItem('users') || '[]');
+    console.log('existingUsers:', existingUsers)
 
-    // Отримуємо існуючих користувачів з localStorage
-    const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-
-    // Перевірка чи існує користувач з введеними логіном і паролем
     const foundUser = existingUsers.find(
-      (user: any) => user.login === formData.login && user.password === formData.password
+      (user: any) => user.login === login && user.password === password
     );
 
     if (foundUser) {
-      // Авторизуємо користувача через контекст
-      login(foundUser);
+      // Перетворення рядка ролі на enum
+      const userRole: Role = foundUser.role === 'admin' ? Role.ADMIN : Role.USER;
 
-      // Перенаправляємо на головну сторінку
+      const userInstance = new User(
+        foundUser.name,
+        foundUser.phone_nums,
+        foundUser.money,
+        foundUser.login,
+        foundUser.password,
+        foundUser.rental_history || [],
+        userRole // Використання enum Role
+      );
+      setCurrentUser(userInstance);
       navigate('/');
     } else {
-      alert('Невірний логін або пароль');
+      alert('Invalid login credentials');
     }
   };
 
@@ -36,19 +46,24 @@ const LoginPage = () => {
         type="text"
         name="login"
         placeholder="Login"
-        value={formData.login}
-        onChange={(e) => setFormData({ ...formData, login: e.target.value })}
+        value={login}
+        onChange={(e) => setLogin(e.target.value)}
         className="w-full p-2 border rounded"
+        required
       />
       <input
         type="password"
         name="password"
         placeholder="Password"
-        value={formData.password}
-        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
         className="w-full p-2 border rounded"
+        required
       />
-      <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
+      <button
+        type="submit"
+        className="w-full bg-blue-500 text-white p-2 rounded mt-4"
+      >
         Login
       </button>
     </form>

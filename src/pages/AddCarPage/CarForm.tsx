@@ -79,9 +79,8 @@ const CarForm: React.FC<CarFormProps> = ({ formData, handleChange }) => (
     <input
       type="number"
       name="year"
-      value={formData.year}
       onChange={handleChange}
-      placeholder="Year"
+      placeholder="Manufacture year"
       className="px-4 py-2 border rounded-md w-full"
     />
     <input
@@ -96,7 +95,6 @@ const CarForm: React.FC<CarFormProps> = ({ formData, handleChange }) => (
     <input
       type="number"
       name="daily_rate"
-      value={formData.daily_rate}
       onChange={handleChange}
       placeholder="Daily rate"
       className="px-4 py-2 border rounded-md w-full"

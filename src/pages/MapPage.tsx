@@ -6,24 +6,85 @@ import L, { map } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 //import 'react-leaflet-markercluster/dist/styles.css'; // Стилі для кластеру
-import { Garage } from '../models/garage/Garage';
 import AdminCarsList from '../components/AdminCarList.tsx';
 import { Car } from '../models/garage/vehicle/Car';
 import { carIcon } from '../icons/CarIcon.tsx';
 import { garageIcon } from '../icons/GarageIcon.tsx';
 import BackToHome from '../components/BackToHome.tsx';
+import { deserializeGarages } from '../utils/Deserialize.ts';
+import { Garage } from '../models/garage/Garage.ts';
+import { CarIconRed } from '../icons/CarIconRed.tsx';
 
 interface MapPageProps {
-  garages: Garage[];
+  garages_get: Garage[];
 }
 
-const MapPage: React.FC<MapPageProps> = ({ garages }) => {
+const getAllGarages = (): Garage[] => {
+  const savedGarages = localStorage.getItem('garages');
+  if (!savedGarages) {
+    return [];
+  }
+
+  try {
+    const garagesData = JSON.parse(savedGarages);
+    return deserializeGarages(garagesData);
+  } catch (error) {
+    console.error('Помилка при парсингу даних з localStorage:', error);
+    return [];
+  }
+};
+
+const getRandomDirection = () => {
+  const directions = [20, 44];
+  return directions[Math.floor(Math.random() * directions.length)];
+};
+
+const moveCarsRandomly = (garages: Garage[]): Garage[] => {
+  const newGarages =  deserializeGarages(garages.map((garage) => {
+    const updatedVehicles = garage.vehicles.map((car) => {
+      if (car.gps) {
+        const newLatitude = car.gps.latitude + getRandomDirection() * 0.001;
+        const newLongitude = car.gps.longitude + getRandomDirection() * 0.001;
+        return {
+          ...car,
+          gps: {
+            ...car.gps,
+            latitude: newLatitude,
+            longitude: newLongitude,
+          },
+        };
+      }
+      return car;
+    });
+    const gaarge = new Garage(garage.name, garage.address, garage.getMaxCars());
+    updatedVehicles.forEach(vehicle => {
+      gaarge.addVehicle(vehicle)
+    });
+    return gaarge;
+
+  }))
+  localStorage.setItem('garages', JSON.stringify(newGarages));
+  return newGarages;
+};
+
+
+const MapPage: React.FC<MapPageProps> = ({ garages_get }) => {
   const ref = useRef(null)
   
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
   const navigate = useNavigate();
+  const [garages, setGarages] = useState(getAllGarages)
   const mapRef = useRef<L.Map>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null); // Додаємо реф для контейнера карти
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const updatedGarages = moveCarsRandomly(getAllGarages())
+      setGarages(updatedGarages);
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const scrollToMap = () => {
     // Спочатку знаходимо елемент
@@ -62,9 +123,10 @@ const MapPage: React.FC<MapPageProps> = ({ garages }) => {
           14,
           { duration: 1.5 }
         );
-      }, 500);
+      }, 100);
     }
   };
+
 
   return (
     <div className="map-page">
@@ -96,9 +158,31 @@ const MapPage: React.FC<MapPageProps> = ({ garages }) => {
           {/* Маркери Автомобілів поза гаражем */}
           {garage.getRentedCars().map((car, index) => (
             <Marker
-              key={`car-${car.details.license_plate}-${index}`}
+              key={`${car.details.license_plate}`}
               position={[car.gps.latitude, car.gps.longitude]}
               icon={carIcon}
+            >
+              <Popup>
+                <h4>{car.type}</h4>
+                <p>License Plate: {car.details.license_plate}</p>
+                <button 
+              className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              onClick={() => {
+                setSelectedCar(car);
+                scrollToSelectedCar();
+              }}
+            >
+              View Details
+            </button>
+              </Popup>
+            </Marker>
+          ))}
+
+          {garage.getNotReturnedCars().map((car, index) => (
+            <Marker
+              key={`${car.details.license_plate}`}
+              position={[car.gps.latitude, car.gps.longitude]}
+              icon={CarIconRed} 
             >
               <Popup>
                 <h4>{car.type}</h4>

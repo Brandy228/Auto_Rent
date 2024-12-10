@@ -13,9 +13,10 @@ interface GaragesListProps {
 }
 
 // AdminCarList.tsx - update CarCard component
-const CarCard = ({ car, isSelected, onViewOnMap }: { 
+const CarCard = ({ car,garageName ,isSelected, onViewOnMap }: { 
   car: Car; 
   isSelected: boolean; 
+  garageName: string;
   //onClick: () => void;
   onViewOnMap: (car: Car) => void;
 }) => {
@@ -32,10 +33,17 @@ const CarCard = ({ car, isSelected, onViewOnMap }: {
           <h3 className="font-semibold">
             {car.details.exterior.mark} {car.details.exterior.model}
           </h3>
-          <p className="text-sm text-gray-600">Year: {car.details.manufacture_year}</p>
+          <p className="text-sm text-gray-600">Year: {car.details.getManufactureYear()}</p>
           <p className="text-sm text-gray-600">GearBox: {car.details.gear_box}</p>
           <LicensePlate plateNumber={car.details.license_plate} />
-          <p className="text-lg font-bold text-green-600 mt-2">${car.price}/day</p>
+          <p className="text-lg font-bold text-green-600 mt-2">${car.getPricePerDay()}/day</p>
+          {garageName!== '' && (
+            <>
+            <p className="text-sm text-gray-600">Garage: {garageName}</p>
+            <p className="text-sm text-gray-600">Rented by: {car.rents[0].renter_login}</p>
+            <p className="text-sm text-gray-600">Rent end: {car.rents[0].rent_end}</p>
+            </>
+          )}
         </div>
       </div>
       
@@ -58,7 +66,6 @@ export default function AdminCarsList({ garages, selectedCar, onSelectCar, onVie
   const [expandedGarage, setExpandedGarage] = useState<string | null>(null);
   //const [selectedCar, setSelectedCar] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
-
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -93,7 +100,7 @@ export default function AdminCarsList({ garages, selectedCar, onSelectCar, onVie
             >
               <div>
                 <h2 className="text-xl font-semibold">{garage.name}</h2>
-                <p className="text-gray-600">Capacity: {garage.max_cars} cars</p>
+                <p className="text-gray-600">Capacity: {garage.getMaxCars()} cars</p>
               </div>
               <svg
                 className={`w-6 h-6 transform transition-transform duration-300 ${
@@ -114,6 +121,7 @@ export default function AdminCarsList({ garages, selectedCar, onSelectCar, onVie
                       <CarCard
                         key={car.details.license_plate}
                         car={car}
+                        garageName={''}
                         isSelected={selectedCar?.details.license_plate === car.details.license_plate}
                         //onClick={() => onSelectCar(car)}
                         onViewOnMap={() => {
@@ -137,6 +145,7 @@ export default function AdminCarsList({ garages, selectedCar, onSelectCar, onVie
             <CarCard
               key={car.details.license_plate}
               car={car}
+              garageName={garages.find(garage => garage.getRentedCars().includes(car))?.name || ''}
               isSelected={selectedCar?.details.license_plate === car.details.license_plate}
               //onClick={() => onSelectCar(car)}
               onViewOnMap={onViewOnMap}

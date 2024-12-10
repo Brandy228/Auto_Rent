@@ -42,7 +42,7 @@ const PowerSourceForm: React.FC<PowerSourceFormProps> = ({
         </datalist>
         <input
           type="number"
-          value={source.capacity}
+          // value={source.capacity}
           onChange={(e) => handlePowerSourceChange(index, 'capacity', parseFloat(e.target.value))}
           placeholder="Capacity"
           className="px-4 py-2 border rounded-md"

@@ -1,20 +1,18 @@
-import { Person, PersonalInformation } from "./Person.ts";
+import { Person } from "./Person.ts";
 import { RentSpecs } from "../application/RentSpecs";
-import { DriverLicense } from "./DriverLicense";
 
 export class User extends Person {
-    public login: String;
-    private static nextId = 1;
-    public id: number;
-    public password: String;
-    public discount_procent: Number;
+    public login: string;
+    public password: string;
     public rental_history: RentSpecs[]=[];
+    public role: Role;
 
-    constructor(personal_information: PersonalInformation,money: number, criminal_record: Boolean, driver_license: DriverLicense,login:String, password:String) {
-        super(personal_information,money,criminal_record,driver_license)
+    constructor(name:string,phone_numbers:string[],money: number,login:string, password:string, rental_history:RentSpecs[], role:Role) {
+        super(name,phone_numbers,money)
         this.login = login;
         this.password = password;
-        this.id = User.nextId++;
+        this.rental_history = rental_history
+        this.role = role;
     }
 
     public rentVehicle(rent_specs:RentSpecs): void 
@@ -22,5 +20,11 @@ export class User extends Person {
         this.rental_history.push(rent_specs);
     }
 
+}
+
+export enum Role {
+    USER = "user",
+    ADMIN = "admin",
+    OWNER = "owner"
 }
 

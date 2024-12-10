@@ -9,10 +9,11 @@ interface AddGaragePageProps {
 }
 
 export default function AddGaragePage({ onAddGarage }: AddGaragePageProps) {
+  const [errors, setErrors] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     name: '',
-    latitude: 0,
-    longitude: 0,
+    latitude: -200,
+    longitude: -200,
     max_cars: 0,
   });
 
@@ -33,6 +34,8 @@ export default function AddGaragePage({ onAddGarage }: AddGaragePageProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    try 
+    {
 
     const address = new Coordinate(formData.latitude, formData.longitude);
     const newGarage = new Garage(formData.name, address, formData.max_cars);
@@ -47,11 +50,28 @@ export default function AddGaragePage({ onAddGarage }: AddGaragePageProps) {
 
     // Повертаємося на головну сторінку
     navigate('/');
+    } catch (error) {
+      if (error instanceof Error) {
+        setErrors([error.message]);
+      } else {
+        console.error('Unexpected error:', error);
+        setErrors(['An unexpected error occurred.']);
+      }
+    }
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <h2 className="text-2xl font-semibold mb-6">Add New Garage</h2>
+      {errors.length > 0 && (
+        <div className="bg-red-100 text-red-700 p-4 rounded">
+          <ul>
+            {errors.map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ul>
+        </div>
+      )}
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"

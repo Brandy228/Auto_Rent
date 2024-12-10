@@ -1,17 +1,19 @@
+// Vehicle.ts
+
 import { Coordinate } from "../../application/Coordinate";
-import { Feedback } from "../../application/Feedback";
 import { PowerSource } from "./PowerSource";
 
 export abstract class Vehicle {
-    public power_sources: PowerSource[]=[];
+    public power_sources: PowerSource[] = [];
     private price_per_day: number;
     public gps: Coordinate;
-    public type: String;
+    public type: string;
 
-    constructor(power_sources: PowerSource[], gps: Coordinate, type: String) {
+    constructor(power_sources: PowerSource[], gps: Coordinate, type: string, price_per_day: number) {
         this.power_sources = power_sources;
         this.gps = gps;
         this.type = type;
+        this.price_per_day = price_per_day;
     }
 
     public getPricePerDay(): number {
@@ -19,11 +21,21 @@ export abstract class Vehicle {
     }
 
     public setPricePerDay(price: number): void {
-        if (price < 0) {
-            alert("Price cannot be negative");
-            throw new Error("Price cannot be negative");
-        }
         this.price_per_day = price;
+        this.validatePrice();
     }
 
+    public validate(): void {
+        if (!this.power_sources || this.power_sources.length === 0) {
+            throw new Error('At least one power source is required');
+        }
+        this.power_sources.forEach(ps => ps.validate());
+        this.validatePrice();
+    }
+
+    private validatePrice(): void {
+        if (this.price_per_day === undefined || this.price_per_day <= 0) {
+            throw new Error('Price per day must be a positive number');
+        }
+    }
 }
