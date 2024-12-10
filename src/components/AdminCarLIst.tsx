@@ -12,12 +12,10 @@ interface GaragesListProps {
   onViewOnMap: (car: Car) => void; 
 }
 
-// AdminCarList.tsx - update CarCard component
-const CarCard = ({ car,garageName ,isSelected, onViewOnMap }: { 
+const CarCard = ({ car, garageName, isSelected, onViewOnMap }: { 
   car: Car; 
   isSelected: boolean; 
   garageName: string;
-  //onClick: () => void;
   onViewOnMap: (car: Car) => void;
 }) => {
   return (
@@ -37,11 +35,11 @@ const CarCard = ({ car,garageName ,isSelected, onViewOnMap }: {
           <p className="text-sm text-gray-600">GearBox: {car.details.gear_box}</p>
           <LicensePlate plateNumber={car.details.license_plate} />
           <p className="text-lg font-bold text-green-600 mt-2">${car.getPricePerDay()}/day</p>
-          {garageName!== '' && (
+          {garageName !== '' && (
             <>
-            <p className="text-sm text-gray-600">Garage: {garageName}</p>
-            <p className="text-sm text-gray-600">Rented by: {car.rents[0].renter_login}</p>
-            <p className="text-sm text-gray-600">Rent end: {car.rents[0].rent_end}</p>
+              <p className="text-sm text-gray-600">Garage: {garageName}</p>
+              <p className="text-sm text-gray-600">Rented by: {car.rents[0].renter_login}</p>
+              <p className="text-sm text-gray-600">Rent end: {car.rents[0].rent_end}</p>
             </>
           )}
         </div>
@@ -56,16 +54,14 @@ const CarCard = ({ car,garageName ,isSelected, onViewOnMap }: {
       >
         View on Map
       </button>
-
-      {/* Calendar Modal */}
     </div>
   );
 };
 
-export default function AdminCarsList({ garages, selectedCar, onSelectCar, onViewOnMap  }: GaragesListProps) {
+export default function AdminCarsList({ garages, selectedCar, onSelectCar, onViewOnMap }: GaragesListProps) {
   const [expandedGarage, setExpandedGarage] = useState<string | null>(null);
-  //const [selectedCar, setSelectedCar] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  console.log(garages.forEach(garage => console.log(garage.getAvailableCars())));
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -118,18 +114,17 @@ export default function AdminCarsList({ garages, selectedCar, onSelectCar, onVie
               <div className="p-4 bg-gray-50">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {garage.getAvailableCars().map(car => (
-                      <CarCard
-                        key={car.details.license_plate}
-                        car={car}
-                        garageName={''}
-                        isSelected={selectedCar?.details.license_plate === car.details.license_plate}
-                        //onClick={() => onSelectCar(car)}
-                        onViewOnMap={() => {
-                          setExpandedGarage(null);
-                          onViewOnMap(car)}
-                      }
-                      />
-                    ))}
+                    <CarCard
+                      key={car.details.license_plate}
+                      car={car}
+                      garageName={''}
+                      isSelected={selectedCar?.details.license_plate === car.details.license_plate}
+                      onViewOnMap={() => {
+                        setExpandedGarage(null);
+                        onViewOnMap(car);
+                      }}
+                    />
+                  ))}
                 </div>
               </div>
             )}
@@ -138,21 +133,35 @@ export default function AdminCarsList({ garages, selectedCar, onSelectCar, onVie
       </div>
 
       <div className="mt-8">
-        <h2 className="text-2xl font-semibold mb-4">Rented Cars</h2>
+        <h2 className="text-2xl font-semibold mb-4">Not Returned Cars</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {garages.flatMap(garage =>
-            garage.getRentedCars()).map(car => (
+          {garages.flatMap(garage => garage.getNotReturnedCars()).map(car => (
             <CarCard
               key={car.details.license_plate}
               car={car}
-              garageName={garages.find(garage => garage.getRentedCars().includes(car))?.name || ''}
+              garageName={garages.find(garage => garage.getNotReturnedCars().includes(car))?.name || ''}
               isSelected={selectedCar?.details.license_plate === car.details.license_plate}
-              //onClick={() => onSelectCar(car)}
               onViewOnMap={onViewOnMap}
             />
           ))}
         </div>
       </div>
+
+      <div className="mt-8">
+        <h2 className="text-2xl font-semibold mb-4">Rented Cars</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {garages.flatMap(garage => garage.getRentedCars()).map(car => (
+            <CarCard
+              key={car.details.license_plate}
+              car={car}
+              garageName={garages.find(garage => garage.getRentedCars().includes(car))?.name || ''}
+              isSelected={selectedCar?.details.license_plate === car.details.license_plate}
+              onViewOnMap={onViewOnMap}
+            />
+          ))}
+        </div>
+      </div>
+
 
       <style>
         {`

@@ -42,10 +42,14 @@ export class Garage {
 
     public getAvailableCars(): Car[] {
         const today = new Date();
+        const tolerance = 0.01; // Допустима похибка для порівняння координат
+    
         return this.vehicles.filter(car => 
             !car.rents.some(rent => 
                 new Date(rent.rent_start) <= today && new Date(rent.rent_end) >= today
-            )
+            ) && 
+            Math.abs(car.gps.latitude - this.address.latitude) < tolerance && 
+            Math.abs(car.gps.longitude - this.address.longitude) < tolerance
         );
     }
 

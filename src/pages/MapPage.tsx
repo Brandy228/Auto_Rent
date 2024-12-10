@@ -35,14 +35,14 @@ const getAllGarages = (): Garage[] => {
 };
 
 const getRandomDirection = () => {
-  const directions = [20, 44];
+  const directions = [-44, 44];
   return directions[Math.floor(Math.random() * directions.length)];
 };
 
 const moveCarsRandomly = (garages: Garage[]): Garage[] => {
   const newGarages =  deserializeGarages(garages.map((garage) => {
     const updatedVehicles = garage.vehicles.map((car) => {
-      if (car.gps) {
+      if (garage.getRentedCars().includes(car)) {
         const newLatitude = car.gps.latitude + getRandomDirection() * 0.001;
         const newLongitude = car.gps.longitude + getRandomDirection() * 0.001;
         return {
@@ -163,7 +163,7 @@ const MapPage: React.FC<MapPageProps> = ({ garages_get }) => {
               icon={carIcon}
             >
               <Popup>
-                <h4>{car.type}</h4>
+                <h4>{car.details.exterior.mark} {car.details.exterior.model}</h4>
                 <p>License Plate: {car.details.license_plate}</p>
                 <button 
               className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -185,7 +185,7 @@ const MapPage: React.FC<MapPageProps> = ({ garages_get }) => {
               icon={CarIconRed} 
             >
               <Popup>
-                <h4>{car.type}</h4>
+                <h4>{car.details.exterior.mark} {car.details.exterior.model}</h4>
                 <p>License Plate: {car.details.license_plate}</p>
                 <button 
               className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
