@@ -26,6 +26,7 @@ import LoginPage from './pages/LoginPage.tsx';
 import RegisterPage from './pages/RegisterPage.tsx';
 import { AuthContext, AuthProvider } from './AuthContext.tsx';
 import { deserializeGarages } from './utils/Deserialize.ts';
+import AddAdmin from './pages/AddAdminPage.tsx';
 
 const getAllCars = (): Car[] => {
   const garages = getAllGarages(); // Використовуємо десеріалізовані гаражі
@@ -73,7 +74,7 @@ function App() {
   const addCar = (newCars: Car[], newGarages: Garage[]) => {
     setGarages(newGarages);
     localStorage.setItem('garages', JSON.stringify(newGarages));
-    console.log(newGarages)
+    //console.log(newGarages)
     setCarsWithGarages(getAllCarsAndGarages)
 
     
@@ -101,6 +102,12 @@ function App() {
                 <>
                   {currentUser.role === 'admin' && (
                     <>
+                      <Link
+                        to="/add-admin"
+                        className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                      >
+                        Add Admin
+                      </Link>
                       <Link
                         to="/add-garage"
                         className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
@@ -160,6 +167,16 @@ function App() {
                   navigate('/rent', { state: { car } })
                 }}
               />
+            }
+          />
+          <Route
+            path="/add-admin"
+            element={
+              currentUser && currentUser.role === 'admin' ? (
+                <AddAdmin />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
           <Route

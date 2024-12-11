@@ -56,9 +56,8 @@ export class Garage {
     public getNotReturnedCars(): Car[] {
         const today = new Date();
         return this.vehicles.filter(car => 
-            car.rents.some(rent => 
-                new Date(rent.rent_end) < today
-            ) && car.gps.latitude !== this.address.latitude && car.gps.longitude !== this.address.longitude
+            (!this.getRentedCars().includes(car)) &&
+             car.gps.latitude !== this.address.latitude && car.gps.longitude !== this.address.longitude
         );
     }
 

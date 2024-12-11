@@ -22,6 +22,24 @@ export class Car extends Vehicle {
         super.validate();
         this.details.validate();
     }
+
+    public getCurrentOrClosestPastRent(): RentSpecs {
+        const today = new Date();
+        const currentRent = this.rents.find(rent => new Date(rent.rent_start) <= today && new Date(rent.rent_end) >= today);
+        if (currentRent) {
+            return currentRent;
+        }
+
+        const pastRents = this.rents.filter(rent => new Date(rent.rent_end) < today);
+        if (pastRents.length === 0) {
+            return this.rents[0];
+        }
+        return pastRents.reduce((closest, rent) => {
+            const rentEnd = new Date(rent.rent_end);
+            const closestEnd = new Date(closest.rent_end);
+            return rentEnd > closestEnd ? rent : closest;
+        });
+    }
 }
 
 export class CarDetails {

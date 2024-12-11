@@ -64,7 +64,7 @@ export default function AddGaragePage({ onAddGarage }: AddGaragePageProps) {
     <div className="max-w-7xl mx-auto px-4 py-8">
       <h2 className="text-2xl font-semibold mb-6">Add New Garage</h2>
       {errors.length > 0 && (
-        <div className="bg-red-100 text-red-700 p-4 rounded">
+        <div className="bg-red-100 text-red-700 p-4 rounded mb-4">
           <ul>
             {errors.map((error, index) => (
               <li key={index}>{error}</li>

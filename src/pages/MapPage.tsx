@@ -42,7 +42,7 @@ const getRandomDirection = () => {
 const moveCarsRandomly = (garages: Garage[]): Garage[] => {
   const newGarages =  deserializeGarages(garages.map((garage) => {
     const updatedVehicles = garage.vehicles.map((car) => {
-      if (garage.getRentedCars().includes(car)) {
+      if (!garage.getAvailableCars().includes(car)) {
         const newLatitude = car.gps.latitude + getRandomDirection() * 0.001;
         const newLongitude = car.gps.longitude + getRandomDirection() * 0.001;
         return {
@@ -72,6 +72,7 @@ const MapPage: React.FC<MapPageProps> = ({ garages_get }) => {
   const ref = useRef(null)
   
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
+  const [scrollToCard, setScrollToCard] = useState(false);
   const navigate = useNavigate();
   const [garages, setGarages] = useState(getAllGarages)
   const mapRef = useRef<L.Map>(null);
@@ -81,14 +82,14 @@ const MapPage: React.FC<MapPageProps> = ({ garages_get }) => {
     const interval = setInterval(() => {
       const updatedGarages = moveCarsRandomly(getAllGarages())
       setGarages(updatedGarages);
-    }, 10000);
+    }, 6000);
 
     return () => clearInterval(interval);
   }, []);
 
   const scrollToMap = () => {
     // Спочатку знаходимо елемент
-    console.log(mapContainerRef.current)
+    console.log(mapContainerRef.current, "bbnb")
     const mapElement = mapContainerRef.current;
     if (!mapElement) return;
 
@@ -112,21 +113,46 @@ const MapPage: React.FC<MapPageProps> = ({ garages_get }) => {
     }
   };
 
-  const handleViewOnMap = (car: Car) => {
-    setSelectedCar(car);
-   console.log(mapRef.current)
-    if (mapRef.current) {
+  // const handleViewOnMap = (car: Car) => {
+  //   setSelectedCar(car);
+  //  console.log(mapRef.current, "AAAA")
+  //   if (mapRef.current) {
+  //     scrollToMap(); // Спочатку прокручуємо до карти
+  //     setTimeout(() => { // Даємо час на прокрутку
+  //       mapRef.current?.flyTo(
+  //         [car.gps.latitude, car.gps.longitude],
+  //         14,
+  //         { duration: 1.5 }
+  //       );
+  //     }, 500);
+  //   }
+  // };
+
+
+  useEffect(() => {
+    if (selectedCar && mapRef.current) {
+      if (scrollToCard) {
+        scrollToSelectedCar()
+        setScrollToCard(false)
+      } else {
       scrollToMap(); // Спочатку прокручуємо до карти
       setTimeout(() => { // Даємо час на прокрутку
         mapRef.current?.flyTo(
-          [car.gps.latitude, car.gps.longitude],
+          [selectedCar.gps.latitude, selectedCar.gps.longitude],
           14,
           { duration: 1.5 }
         );
-      }, 100);
+      }, 500);
+    }}
+  }, [selectedCar]);
+
+
+  const handleViewOnMap = (car: Car) => {
+    setSelectedCar(car);
+    if (mapRef.current) {
+      mapRef.current.flyTo([car.gps.latitude, car.gps.longitude], 14, { duration: 1.5 });
     }
   };
-
 
   return (
     <div className="map-page">
@@ -150,7 +176,8 @@ const MapPage: React.FC<MapPageProps> = ({ garages_get }) => {
             >
               <Popup>
                 <h4>{garage.name}</h4>
-                <p>Vehicles in garage: {garage.vehicles.length}</p>
+                <p>Cars in garage: {garage.getAvailableCars().length}</p>
+                <p>All cars: {garage.vehicles.length}</p>
               </Popup>
             </Marker>
           
@@ -169,6 +196,7 @@ const MapPage: React.FC<MapPageProps> = ({ garages_get }) => {
               className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
               onClick={() => {
                 setSelectedCar(car);
+                setScrollToCard(true)
                 scrollToSelectedCar();
               }}
             >
@@ -191,6 +219,7 @@ const MapPage: React.FC<MapPageProps> = ({ garages_get }) => {
               className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
               onClick={() => {
                 setSelectedCar(car);
+                setScrollToCard(true); 
                 scrollToSelectedCar();
               }}
             >

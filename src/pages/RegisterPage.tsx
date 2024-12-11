@@ -97,7 +97,7 @@ const RegisterPage = () => {
       formData.login,
       formData.password,
       [], // rentalHistory
-      formData.role // Використання enum Role
+      Role.USER // Використання enum Role
     );
 
     existingUsers.push(newUser);
@@ -188,19 +188,6 @@ const RegisterPage = () => {
       </div>
 
       {/* Вибір ролі */}
-      <div className="mt-4">
-        <label className="block font-medium">Role:</label>
-        <select
-          name="role"
-          value={formData.role}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-          required
-        >
-          <option value={Role.USER}>User</option>
-          <option value={Role.ADMIN}>Admin</option>
-        </select>
-      </div>
 
       <button
         type="submit"

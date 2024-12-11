@@ -12,6 +12,15 @@ interface GaragesListProps {
   onViewOnMap: (car: Car) => void; 
 }
 
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  date.setDate(date.getDate() + 1); // Додаємо один день
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Місяці в JavaScript починаються з 0
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+};
+
 const CarCard = ({ car, garageName, isSelected, onViewOnMap }: { 
   car: Car; 
   isSelected: boolean; 
@@ -38,8 +47,8 @@ const CarCard = ({ car, garageName, isSelected, onViewOnMap }: {
           {garageName !== '' && (
             <>
               <p className="text-sm text-gray-600">Garage: {garageName}</p>
-              <p className="text-sm text-gray-600">Rented by: {car.rents[0].renter_login}</p>
-              <p className="text-sm text-gray-600">Rent end: {car.rents[0].rent_end}</p>
+              <p className="text-sm text-gray-600">Rented by: {car.getCurrentOrClosestPastRent().renter_login}</p>
+              <p className="text-sm text-gray-600">Rent end: {formatDate(car.getCurrentOrClosestPastRent().rent_end)}</p>
             </>
           )}
         </div>
@@ -61,7 +70,7 @@ const CarCard = ({ car, garageName, isSelected, onViewOnMap }: {
 export default function AdminCarsList({ garages, selectedCar, onSelectCar, onViewOnMap }: GaragesListProps) {
   const [expandedGarage, setExpandedGarage] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
-  console.log(garages.forEach(garage => console.log(garage.getAvailableCars())));
+  //console.log(garages.forEach(garage => console.log(garage.getAvailableCars())));
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -96,7 +105,7 @@ export default function AdminCarsList({ garages, selectedCar, onSelectCar, onVie
             >
               <div>
                 <h2 className="text-xl font-semibold">{garage.name}</h2>
-                <p className="text-gray-600">Capacity: {garage.getMaxCars()} cars</p>
+                <p className="text-gray-600">Capacity: {garage.getMaxCars()} cars, All cars: {garage.vehicles.length}</p>
               </div>
               <svg
                 className={`w-6 h-6 transform transition-transform duration-300 ${
